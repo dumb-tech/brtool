@@ -1,4 +1,4 @@
-module brtool
+module github.com/dumb-tech/brtool
 
 go 1.21
 
