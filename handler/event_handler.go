@@ -18,9 +18,9 @@ const (
 	eventTypeDeleted = "rows.deleted"
 )
 
-type CreateHandleFunc func(items []dynstruct.Reader)
-type UpdateHandleFunc func(items []dynstruct.Reader, oldItems []dynstruct.Reader)
-type DeleteHandleFunc func(ids []int)
+type CreateHandleFunc func(tableID int, items []dynstruct.Reader)
+type UpdateHandleFunc func(tableID int, items []dynstruct.Reader, oldItems []dynstruct.Reader)
+type DeleteHandleFunc func(tableID int, ids []int)
 
 type EventHandler struct {
 	CustomItemDef    dynstruct.DynamicStruct
@@ -66,19 +66,22 @@ func (eh *EventHandler) Handle(data []byte) error {
 
 	switch evt {
 	case eventTypeCreated:
+		tableID := whr.GetField("TableId").Int()
 		items := dynstruct.NewReader(whr.GetField("Items").Interface()).ToSliceOfReaders()
-		eh.createHandler(items)
+		eh.createHandler(tableID, items)
 	case eventTypeUpdated:
+		tableID := whr.GetField("TableId").Int()
 		items := dynstruct.NewReader(whr.GetField("Items").Interface()).ToSliceOfReaders()
 		oldItems := dynstruct.NewReader(whr.GetField("OldItems").Interface()).ToSliceOfReaders()
-		eh.updateHandler(items, oldItems)
+		eh.updateHandler(tableID, items, oldItems)
 	case eventTypeDeleted:
+		tableID := whr.GetField("TableId").Int()
 		var ids []int
 		cast, ok := whr.GetField("RowIDs").Interface().([]int)
 		if ok {
 			ids = cast
 		}
-		eh.deleteHandler(ids)
+		eh.deleteHandler(tableID, ids)
 	default:
 		return errors.New(fmt.Sprintf("unknown event type %q", evt))
 	}
