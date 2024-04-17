@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	apiRequestURL = func(host, endpoint string) string { return host + endpoint }
+	apiRequestURL = func(host, endpoint string) string { return "https://" + host + endpoint }
 
 	endpointApi = "/api"
 
