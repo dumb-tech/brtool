@@ -88,14 +88,14 @@ type WorkingStruct struct {
 func main() {
 	h := handler.NewEventHandler(WorkingStruct{})
 
-	h.OnCreate(func(itemsSet []dynstruct.Reader) {
+	h.OnCreate(func(tableID int, itemsSet []dynstruct.Reader) {
 		fmt.Println("--- event:create ---")
 		for _, item := range itemsSet {
 			fmt.Println(item.GetField("Number").String())
 			fmt.Println(item.GetField("Updated").Time().String())
 		}
 	})
-	h.OnUpdate(func(itemsSet []dynstruct.Reader, oldItemsSet []dynstruct.Reader) {
+	h.OnUpdate(func(tableID int, itemsSet []dynstruct.Reader, oldItemsSet []dynstruct.Reader) {
 		fmt.Println("--- event:update ---")
 		fmt.Println("--- event:update:items ---")
 		for _, item := range itemsSet {
@@ -108,7 +108,7 @@ func main() {
 			fmt.Println(item.GetField("Updated").Time().String())
 		}
 	})
-	h.OnDelete(func(ids []int) {
+	h.OnDelete(func(tableID int, ids []int) {
 		fmt.Println("--- event:delete ---")
 		for _, did := range ids {
 			fmt.Println("-- Deleted row ID:", did)
