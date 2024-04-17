@@ -61,6 +61,11 @@ func (bc *BaserowClient) SetLogger(log *slog.Logger) *BaserowClient {
 	return bc
 }
 
+func (bc *BaserowClient) Debug(v bool) *BaserowClient {
+	bc.cfg.debug = v
+	return bc
+}
+
 func (bc *BaserowClient) UseTLS(v bool) {
 	bc.cl.Transport = http.DefaultTransport
 	if v {
