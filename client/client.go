@@ -66,7 +66,7 @@ func (bc *BaserowClient) Debug(v bool) *BaserowClient {
 	return bc
 }
 
-func (bc *BaserowClient) UseTLS(v bool) {
+func (bc *BaserowClient) UseTLS(v bool) *BaserowClient {
 	bc.cl.Transport = http.DefaultTransport
 	if v {
 		bc.cl.Transport = &http.Transport{
@@ -74,6 +74,8 @@ func (bc *BaserowClient) UseTLS(v bool) {
 		}
 	}
 	bc.useTLS = v
+
+	return bc
 }
 
 func (bc *BaserowClient) Ping() error {
