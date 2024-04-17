@@ -2,9 +2,11 @@ package handler
 
 import (
 	"brtool/entites"
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 
 	dynstruct "github.com/ompluscator/dynamic-struct"
 )
@@ -40,6 +42,16 @@ func NewEventHandler(definition any) *EventHandler {
 func (eh *EventHandler) OnCreate(f CreateHandleFunc) { eh.createHandler = f }
 func (eh *EventHandler) OnUpdate(f UpdateHandleFunc) { eh.updateHandler = f }
 func (eh *EventHandler) OnDelete(f DeleteHandleFunc) { eh.deleteHandler = f }
+
+func (eh *EventHandler) HandleRequest(req *http.Request) error {
+	data := bytes.Buffer{}
+	if _, err := data.ReadFrom(req.Body); err != nil {
+		return err
+	}
+	defer req.Body.Close()
+
+	return eh.Handle(data.Bytes())
+}
 
 func (eh *EventHandler) Handle(data []byte) error {
 	webhook := eh.CustomWebhookDef.New()
