@@ -23,7 +23,7 @@ var (
 
 	endpointApi = "/api"
 
-	endpointApiSettings       = endpointApi + "/settings"
+	endpointApiSettings       = endpointApi + "/settings/"
 	endpointApiDatabase       = endpointApi + "/database"
 	endpointDatabaseRows      = endpointApiDatabase + "/rows"
 	endpointDatabaseRowsTable = endpointDatabaseRows + "/table"
@@ -72,6 +72,12 @@ func (bc *BaserowClient) UseTLS(v bool) {
 }
 
 func (bc *BaserowClient) Ping() error {
+	req, err := http.NewRequest(http.MethodGet, apiRequestURL(bc.useTLS, bc.cfg.host, endpointApiSettings), nil)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Authorization", "Token "+bc.cfg.token)
+
 	resp, err := bc.cl.Get(apiRequestURL(bc.useTLS, bc.cfg.host, endpointApiSettings))
 	if err != nil {
 		return err
@@ -80,6 +86,28 @@ func (bc *BaserowClient) Ping() error {
 
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("failed to ping baserows host %q", bc.cfg.host)
+	}
+
+	type Settings struct {
+		AllowNewSignups                     bool        `json:"allow_new_signups"`
+		AllowSignupsViaWorkspaceInvitations bool        `json:"allow_signups_via_workspace_invitations"`
+		AllowSignupsViaGroupInvitations     bool        `json:"allow_signups_via_group_invitations"`
+		AllowResetPassword                  bool        `json:"allow_reset_password"`
+		AllowGlobalWorkspaceCreation        bool        `json:"allow_global_workspace_creation"`
+		AllowGlobalGroupCreation            bool        `json:"allow_global_group_creation"`
+		AccountDeletionGraceDelay           int         `json:"account_deletion_grace_delay"`
+		ShowAdminSignupPage                 bool        `json:"show_admin_signup_page"`
+		TrackWorkspaceUsage                 bool        `json:"track_workspace_usage"`
+		ShowBaserowHelpRequest              bool        `json:"show_baserow_help_request"`
+		CoBrandingLogo                      interface{} `json:"co_branding_logo"`
+		InstanceWideLicenses                struct {
+		} `json:"instance_wide_licenses"`
+	}
+
+	var settings Settings
+
+	if err := json.NewDecoder(resp.Body).Decode(&settings); err != nil {
+		return fmt.Errorf("failed to get settings by baserow api via host %q", bc.cfg.host)
 	}
 
 	return nil
