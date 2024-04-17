@@ -1,12 +1,13 @@
 package handler
 
 import (
-	"brtool/entites"
 	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
+
+	"github.com/dumb-tech/brtool/entites"
 
 	dynstruct "github.com/ompluscator/dynamic-struct"
 )

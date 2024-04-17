@@ -1,12 +1,13 @@
 package main
 
 import (
-	"brtool/entites"
-	"brtool/handler"
 	"fmt"
-	dynstruct "github.com/ompluscator/dynamic-struct"
 	"log"
 	"time"
+
+	"github.com/dumb-tech/brtool/entites"
+	"github.com/dumb-tech/brtool/handler"
+	dynstruct "github.com/ompluscator/dynamic-struct"
 )
 
 const createDataSample = `{
