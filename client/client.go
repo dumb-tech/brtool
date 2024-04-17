@@ -13,7 +13,13 @@ import (
 )
 
 var (
-	apiRequestURL = func(host, endpoint string) string { return "https://" + host + endpoint }
+	apiRequestURL = func(useTLS bool, host, endpoint string) string {
+		scheme := "http://"
+		if useTLS {
+			scheme = "https://"
+		}
+		return scheme + host + endpoint
+	}
 
 	endpointApi = "/api"
 
@@ -34,9 +40,10 @@ type config struct {
 }
 
 type BaserowClient struct {
-	cl  *http.Client
-	cfg config
-	log *slog.Logger
+	cl     *http.Client
+	cfg    config
+	log    *slog.Logger
+	useTLS bool
 }
 
 func New(host string, token string) *BaserowClient {
@@ -61,10 +68,11 @@ func (bc *BaserowClient) UseTLS(v bool) {
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}
 	}
+	bc.useTLS = v
 }
 
 func (bc *BaserowClient) Ping() error {
-	resp, err := bc.cl.Get(apiRequestURL(bc.cfg.host, endpointApiSettings))
+	resp, err := bc.cl.Get(apiRequestURL(bc.useTLS, bc.cfg.host, endpointApiSettings))
 	if err != nil {
 		return err
 	}
@@ -78,7 +86,7 @@ func (bc *BaserowClient) Ping() error {
 }
 
 func (bc *BaserowClient) UpdateRowField(tableID int, rowID int, field string, new string) error {
-	url := apiRequestURL(bc.cfg.host, endpointUpdateRow(strconv.Itoa(tableID), strconv.Itoa(rowID)))
+	url := apiRequestURL(bc.useTLS, bc.cfg.host, endpointUpdateRow(strconv.Itoa(tableID), strconv.Itoa(rowID)))
 
 	payload, err := json.Marshal(map[string]string{field: new})
 	if err != nil {
