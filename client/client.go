@@ -134,6 +134,12 @@ func (bc *BaserowClient) UpdateRowField(tableID int, rowID int, field string, ne
 	req.Header.Set("Authorization", "Token "+bc.cfg.token)
 	req.Header.Set("Content-Type", "application/json")
 
+	if bc.cfg.debug {
+		dump, _ := httputil.DumpRequest(req, true)
+		fmt.Printf("=== REQUEST =================\n\n %s\n\n", string(dump))
+		fmt.Println()
+	}
+
 	resp, err := bc.cl.Do(req)
 	if err != nil {
 		return err
@@ -141,11 +147,7 @@ func (bc *BaserowClient) UpdateRowField(tableID int, rowID int, field string, ne
 	defer resp.Body.Close()
 
 	if bc.cfg.debug {
-		dump, _ := httputil.DumpRequest(req, true)
-		fmt.Printf("=== REQUEST =================\n\n %s\n\n", string(dump))
-		fmt.Println()
-
-		dump, _ = httputil.DumpResponse(resp, true)
+		dump, _ := httputil.DumpResponse(resp, true)
 		fmt.Printf("=== RESPONSE =================\n\n %s\n\n", string(dump))
 		fmt.Println()
 	}
