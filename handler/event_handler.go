@@ -1,10 +1,10 @@
 package handler
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/dumb-tech/brtool/entites"
@@ -45,13 +45,13 @@ func (eh *EventHandler) OnUpdate(f UpdateHandleFunc) { eh.updateHandler = f }
 func (eh *EventHandler) OnDelete(f DeleteHandleFunc) { eh.deleteHandler = f }
 
 func (eh *EventHandler) HandleRequest(req *http.Request) error {
-	data := bytes.Buffer{}
-	if _, err := data.ReadFrom(req.Body); err != nil {
+	data, err := io.ReadAll(req.Body)
+	if err != nil {
 		return err
 	}
 	defer req.Body.Close()
 
-	return eh.Handle(data.Bytes())
+	return eh.Handle(data)
 }
 
 func (eh *EventHandler) Handle(data []byte) error {
