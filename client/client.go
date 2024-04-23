@@ -5,10 +5,10 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"github.com/dumb-tech/brtool/util"
 	"io"
 	"log/slog"
 	"net/http"
-	"net/http/httputil"
 	"os"
 	"strconv"
 )
@@ -90,12 +90,7 @@ func (bc *BaserowClient) Ping() error {
 	}
 	req.Header.Set("Authorization", "Token "+bc.cfg.token)
 
-	if bc.cfg.debug {
-		reqCopy := *req
-		dump, _ := httputil.DumpRequest(&reqCopy, true)
-		fmt.Printf("=== REQUEST =================\n\n %s\n\n", string(dump))
-		fmt.Println()
-	}
+	util.DumpRequest(bc.cfg.debug, req)
 
 	resp, err := bc.cl.Get(apiRequestURL(bc.useTLS, bc.cfg.host, endpointApiSettings))
 	if err != nil {
@@ -108,12 +103,7 @@ func (bc *BaserowClient) Ping() error {
 		}
 	}(resp.Body)
 
-	if bc.cfg.debug {
-		respCopy := *resp
-		dump, _ := httputil.DumpResponse(&respCopy, true)
-		fmt.Printf("=== RESPONSE =================\n\n %s\n\n", string(dump))
-		fmt.Println()
-	}
+	util.DumpResponse(bc.cfg.debug, resp)
 
 	if bc.useTLS && resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("failed to ping baserows host %q", bc.cfg.host)
@@ -161,12 +151,7 @@ func (bc *BaserowClient) UpdateRowField(tableID int, rowID int, field string, ne
 	req.Header.Set("Authorization", "Token "+bc.cfg.token)
 	req.Header.Set("Content-Type", "application/json")
 
-	if bc.cfg.debug {
-		reqCopy := *req
-		dump, _ := httputil.DumpRequest(&reqCopy, true)
-		fmt.Printf("=== REQUEST =================\n\n %s\n\n", string(dump))
-		fmt.Println()
-	}
+	util.DumpRequest(bc.cfg.debug, req)
 
 	resp, err := bc.cl.Do(req)
 	if err != nil {
@@ -179,12 +164,7 @@ func (bc *BaserowClient) UpdateRowField(tableID int, rowID int, field string, ne
 		}
 	}(resp.Body)
 
-	if bc.cfg.debug {
-		respCopy := *resp
-		dump, _ := httputil.DumpResponse(&respCopy, true)
-		fmt.Printf("=== RESPONSE =================\n\n %s\n\n", string(dump))
-		fmt.Println()
-	}
+	util.DumpResponse(bc.cfg.debug, resp)
 
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("failed to update baserow row field. status - %d\n",
