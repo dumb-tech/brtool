@@ -91,7 +91,8 @@ func (bc *BaserowClient) Ping() error {
 	req.Header.Set("Authorization", "Token "+bc.cfg.token)
 
 	if bc.cfg.debug {
-		dump, _ := httputil.DumpRequest(req, true)
+		reqCopy := *req
+		dump, _ := httputil.DumpRequest(&reqCopy, true)
 		fmt.Printf("=== REQUEST =================\n\n %s\n\n", string(dump))
 		fmt.Println()
 	}
@@ -108,7 +109,8 @@ func (bc *BaserowClient) Ping() error {
 	}(resp.Body)
 
 	if bc.cfg.debug {
-		dump, _ := httputil.DumpResponse(resp, true)
+		respCopy := *resp
+		dump, _ := httputil.DumpResponse(&respCopy, true)
 		fmt.Printf("=== RESPONSE =================\n\n %s\n\n", string(dump))
 		fmt.Println()
 	}
@@ -160,7 +162,8 @@ func (bc *BaserowClient) UpdateRowField(tableID int, rowID int, field string, ne
 	req.Header.Set("Content-Type", "application/json")
 
 	if bc.cfg.debug {
-		dump, _ := httputil.DumpRequest(req, true)
+		reqCopy := *req
+		dump, _ := httputil.DumpRequest(&reqCopy, true)
 		fmt.Printf("=== REQUEST =================\n\n %s\n\n", string(dump))
 		fmt.Println()
 	}
@@ -177,7 +180,8 @@ func (bc *BaserowClient) UpdateRowField(tableID int, rowID int, field string, ne
 	}(resp.Body)
 
 	if bc.cfg.debug {
-		dump, _ := httputil.DumpResponse(resp, true)
+		respCopy := *resp
+		dump, _ := httputil.DumpResponse(&respCopy, true)
 		fmt.Printf("=== RESPONSE =================\n\n %s\n\n", string(dump))
 		fmt.Println()
 	}
