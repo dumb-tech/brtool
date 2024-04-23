@@ -80,7 +80,7 @@ func (bc *BaserowClient) UseTLS(v bool) *BaserowClient {
 }
 
 func (bc *BaserowClient) Ping() error {
-	req, err := http.NewRequest(http.MethodGet, apiRequestURL(bc.useTLS, bc.cfg.host, endpointApiSettings), nil)
+	req, err := http.NewRequest(http.MethodGet, apiRequestURL(bc.useTLS, bc.cfg.host, ""), nil)
 	if err != nil {
 		return err
 	}
