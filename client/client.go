@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log/slog"
 	"net/http"
 	"net/http/httputil"
@@ -85,11 +86,28 @@ func (bc *BaserowClient) Ping() error {
 	}
 	req.Header.Set("Authorization", "Token "+bc.cfg.token)
 
+	if bc.cfg.debug {
+		dump, _ := httputil.DumpRequest(req, true)
+		fmt.Printf("=== REQUEST =================\n\n %s\n\n", string(dump))
+		fmt.Println()
+	}
+
 	resp, err := bc.cl.Get(apiRequestURL(bc.useTLS, bc.cfg.host, endpointApiSettings))
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			fmt.Println("failed to close body via ping baserow host")
+		}
+	}(resp.Body)
+
+	if bc.cfg.debug {
+		dump, _ := httputil.DumpResponse(resp, true)
+		fmt.Printf("=== RESPONSE =================\n\n %s\n\n", string(dump))
+		fmt.Println()
+	}
 
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("failed to ping baserows host %q", bc.cfg.host)
@@ -144,7 +162,12 @@ func (bc *BaserowClient) UpdateRowField(tableID int, rowID int, field string, ne
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			fmt.Println("failed to close response body via update row field")
+		}
+	}(resp.Body)
 
 	if bc.cfg.debug {
 		dump, _ := httputil.DumpResponse(resp, true)
