@@ -113,7 +113,10 @@ func (bc *BaserowClient) Ping() error {
 		fmt.Println()
 	}
 
-	if resp.StatusCode != http.StatusOK {
+	if bc.useTLS && resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to ping baserows host %q", bc.cfg.host)
+	}
+	if !bc.useTLS && resp.StatusCode != http.StatusFound {
 		return fmt.Errorf("failed to ping baserows host %q", bc.cfg.host)
 	}
 
