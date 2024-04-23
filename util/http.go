@@ -9,7 +9,7 @@ import (
 )
 
 func DumpRequest(debug bool, req *http.Request) {
-	if !debug {
+	if !debug || req == nil || req.Body == nil {
 		return
 	}
 
@@ -26,7 +26,7 @@ func DumpRequest(debug bool, req *http.Request) {
 }
 
 func DumpResponse(debug bool, resp *http.Response) {
-	if !debug {
+	if !debug || resp == nil || resp.Body == nil {
 		return
 	}
 
